@@ -15,7 +15,7 @@ public class CoinService {
         this.coinApi = new CoinApi();
     }
 
-    public List<Coin> getCoinsSymbols(){
+    public List<Coin> getAllCoins(){
         List<Coin> coins = null;
         try {
             coins = coinApi.getALlCoins();

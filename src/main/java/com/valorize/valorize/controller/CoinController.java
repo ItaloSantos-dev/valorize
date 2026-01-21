@@ -18,7 +18,7 @@ public class CoinController {
     }
     @GetMapping
     //Função que pega as strings das moedas
-    public List<Coin> coinsSymbolString(){
-        return this.coinService.getCoinsSymbols();
+    public List<Coin> getAllCoins(){
+        return this.coinService.getAllCoins();
     }
 }
