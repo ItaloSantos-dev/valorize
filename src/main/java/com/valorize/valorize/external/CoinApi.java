@@ -2,14 +2,18 @@ package com.valorize.valorize.external;
 
 
 import com.valorize.valorize.model.Coin;
+import com.valorize.valorize.model.CoinQuotation;
+import com.valorize.valorize.model.Quotation;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +36,22 @@ public class CoinApi {
                 new TypeReference<List<Coin>>() {}
         );
         return coins;
+
+    }
+    //https://brasilapi.com.br/api/cambio/v1/cotacao/{symbol}/{data}
+    public Quotation getById (String coinSymbol) throws IOException, InterruptedException {
+        LocalDate ontem = LocalDate.now().minusDays(1);
+
+        HttpRequest request = HttpRequest.newBuilder(URI.create("https://brasilapi.com.br/api/cambio/v1/cotacao/"+coinSymbol+"/"+ontem)).build();
+        HttpResponse response = client.send(request, HttpResponse.BodyHandlers
+                .ofString());
+        String responseString = response.body().toString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        Quotation quotation = mapper.readValue(responseString, CoinQuotation.class).getQuotations().getFirst();
+        quotation.setCoinName(coinSymbol);
+
+        return quotation;
 
     }
 }
