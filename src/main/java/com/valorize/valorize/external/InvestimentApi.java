@@ -20,7 +20,7 @@ public class InvestimentApi {
     }
 
     public List<Investiment> getAllInvestiments() throws IOException, InterruptedException {
-        List<Investiment> investiments = new ArrayList<>();
+        List<Investiment> investiments;
 
         HttpRequest request = HttpRequest.newBuilder(URI.create("https://brasilapi.com.br/api/taxas/v1")).build();
         HttpResponse response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -28,10 +28,24 @@ public class InvestimentApi {
 
         ObjectMapper mapper = new ObjectMapper();
         investiments = mapper.readValue(responseString,
-                new TypeReference<List<Investiment>>() {}
+                new TypeReference<>() {
+                }
         );
 
         return investiments;
+    }
+
+    public Investiment getInvestimentById(String investimentType) throws IOException, InterruptedException {
+        Investiment investiment;
+        HttpRequest request = HttpRequest.newBuilder(URI.create("https://brasilapi.com.br/api/taxas/v1/"+investimentType)).build();
+        HttpResponse response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        String resposeString = response.body().toString();
+        ObjectMapper mapper = new ObjectMapper();
+
+        investiment = mapper.readValue(resposeString, Investiment.class);
+        return investiment;
+
     }
 
 }

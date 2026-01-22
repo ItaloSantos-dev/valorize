@@ -30,5 +30,35 @@ public class Quotation {
     @JsonProperty("cotacao_venda")
     private double quotationSell;
 
+    public double getParityBuy() {
+        return parityBuy;
+    }
 
+    public void setParityBuy(double parityBuy) {
+        this.parityBuy = parityBuy;
+    }
+
+    public double getParitySell() {
+        return paritySell;
+    }
+
+    public void setParitySell(double paritySell) {
+        this.paritySell = paritySell;
+    }
+
+    public double getQuotationBuy() {
+        return quotationBuy;
+    }
+
+    public void setQuotationBuy(double quotationBuy) {
+        this.quotationBuy = quotationBuy;
+    }
+
+    public double getQuotationSell() {
+        return quotationSell;
+    }
+
+    public void setQuotationSell(double quotationSell) {
+        this.quotationSell = quotationSell;
+    }
 }

@@ -5,11 +5,11 @@ import com.valorize.valorize.DTO.ResponseDTO;
 import com.valorize.valorize.external.CoinApi;
 import com.valorize.valorize.external.InvestimentApi;
 import com.valorize.valorize.model.Coin;
+import com.valorize.valorize.model.Investiment;
 import com.valorize.valorize.model.Quotation;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Date;
 
 @Service
 public class CalculatorService {
@@ -22,14 +22,49 @@ public class CalculatorService {
     }
 
     public Object postCalculator(RequestDTO requestDTO){
+        Quotation quotationCoinInput ;
+        Quotation quotationCoinOut;
+        Investiment investimentType;
 
         try{
-            Quotation quotationCoinInput= this.coinApi.getById(requestDTO.coinInputString());
-            Quotation quotationCoinOut= this.coinApi.getById(requestDTO.coinOutString());
-            return null;
+            quotationCoinInput = this.coinApi.getById(requestDTO.coinInputString());
+            quotationCoinOut = this.coinApi.getById(requestDTO.coinOutString());
+            investimentType= this.investimentApi.getInvestimentById(requestDTO.investimentType());
+
         }catch (IOException | InterruptedException e){
-            return null;
+            return e.getMessage();
         }
+        double amountInBRL = coinInputToBRL(quotationCoinInput, requestDTO.amountInput());
+
+        double rendimentAfterTime = rendimentInTime(investimentType, amountInBRL, requestDTO.amountDay());
+
+        double amountFinalInCoinInput = amountFinalToCoinOut(quotationCoinOut, rendimentAfterTime);
+
+        return amountFinalInCoinInput;
+
+
+
+
+
+
+
+    }
+
+    public double rendimentInTime(Investiment investiment, double amountInBRL, int amountDays){
+        double taxForDay = Math.pow( (1 + (double)investiment.getAmount()/100) , (double)1/252 ) -1;
+        double amountFinal = amountInBRL * Math.pow( (1+taxForDay), amountDays );
+        return amountFinal;
+    }
+
+
+    public double coinInputToBRL(Quotation quotationCoinInput, double amountInput){
+        // 5 unidades de Dólar = 5*6 = 30 reais
+        return  amountInput * quotationCoinInput.getQuotationBuy();
+    }
+
+    public double amountFinalToCoinOut(Quotation quotationCoinOut, double amountFinal){
+        //30 reais para dolar = 30 /  5.6 = +-6
+        return (double)amountFinal / quotationCoinOut.getQuotationBuy();
     }
 
 }
