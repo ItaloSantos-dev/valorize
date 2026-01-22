@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 @RestController
-@RequestMapping("/api/calculator")
+@RequestMapping("/valorize/api/calculator")
 public class CalculatorController {
     private CalculatorService calculatorService;
 
@@ -21,7 +21,7 @@ public class CalculatorController {
     }
 
     @PostMapping
-    public Object postCalculator(@RequestBody RequestDTO requestDTO){
+    public ResponseDTO postCalculator(@RequestBody RequestDTO requestDTO){
         //Validar entradas
         return this.calculatorService.postCalculator(requestDTO);
     }

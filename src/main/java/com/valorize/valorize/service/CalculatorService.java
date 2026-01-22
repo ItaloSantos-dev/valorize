@@ -22,7 +22,7 @@ public class CalculatorService {
         this.investimentApi = new InvestimentApi();
     }
 
-    public Object postCalculator(RequestDTO requestDTO){
+    public ResponseDTO postCalculator(RequestDTO requestDTO){
         Quotation quotationCoinInput ;
         Quotation quotationCoinOut;
         Investiment investimentType;
@@ -33,7 +33,8 @@ public class CalculatorService {
             investimentType= this.investimentApi.getInvestimentById(requestDTO.investimentType());
 
         }catch (IOException | InterruptedException e){
-            return e.getMessage();
+            ResponseDTO responseDTO = new ResponseDTO("false", null, 0, 0, null, 0, null, 0);
+            return responseDTO;
         }
         double amountInBRL = coinInputToBRL(quotationCoinInput, requestDTO.amountInput());
 
@@ -41,25 +42,21 @@ public class CalculatorService {
 
         double amountFinalInCoinInput = amountFinalToCoinOut(quotationCoinOut, rendimentAfterTime);
 
+        float amountProfit = (float)(amountFinalInCoinInput - amountFinalToCoinOut(quotationCoinInput, amountInBRL));
+
         ResponseDTO response = new ResponseDTO(
+                "true",
                 requestDTO.coinOutString(),
-                (float)amountFinalInCoinInput,
+        (float)amountFinalInCoinInput,
+        amountProfit,
+        requestDTO.coinInputString(),
+        requestDTO.amountInput(),
+        investimentType.getName(),
 
-                requestDTO.coinInputString(),
-                requestDTO.amountInput(),
-                investimentType.getName(),
-
-                requestDTO.amountDay()
+        requestDTO.amountDay()
         );
 
         return  response;
-
-
-
-
-
-
-
     }
 
 
