@@ -5,6 +5,7 @@ import com.valorize.valorize.DTO.ResponseDTO;
 import com.valorize.valorize.external.CoinApi;
 import com.valorize.valorize.external.InvestimentApi;
 import com.valorize.valorize.model.Coin;
+import com.valorize.valorize.model.CoinQuotation;
 import com.valorize.valorize.model.Investiment;
 import com.valorize.valorize.model.Quotation;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,18 @@ public class CalculatorService {
 
         double amountFinalInCoinInput = amountFinalToCoinOut(quotationCoinOut, rendimentAfterTime);
 
-        return amountFinalInCoinInput;
+        ResponseDTO response = new ResponseDTO(
+                requestDTO.coinOutString(),
+                (float)amountFinalInCoinInput,
+
+                requestDTO.coinInputString(),
+                requestDTO.amountInput(),
+                investimentType.getName(),
+
+                requestDTO.amountDay()
+        );
+
+        return  response;
 
 
 
@@ -49,6 +61,7 @@ public class CalculatorService {
 
 
     }
+
 
     public double rendimentInTime(Investiment investiment, double amountInBRL, int amountDays){
         double taxForDay = Math.pow( (1 + (double)investiment.getAmount()/100) , (double)1/252 ) -1;
