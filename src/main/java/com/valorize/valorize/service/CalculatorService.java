@@ -2,6 +2,7 @@ package com.valorize.valorize.service;
 
 import com.valorize.valorize.DTO.RequestDTO;
 import com.valorize.valorize.DTO.ResponseDTO;
+import com.valorize.valorize.exception.FailedAcessAPIException;
 import com.valorize.valorize.external.CoinApi;
 import com.valorize.valorize.external.InvestimentApi;
 import com.valorize.valorize.model.Coin;
@@ -28,14 +29,15 @@ public class CalculatorService {
         Investiment investimentType;
 
         try{
-            quotationCoinInput = this.coinApi.getById(requestDTO.coinInputString());
-            quotationCoinOut = this.coinApi.getById(requestDTO.coinOutString());
-            investimentType= this.investimentApi.getInvestimentById(requestDTO.investimentType());
+            quotationCoinInput = this.coinApi.getById(requestDTO.coinInputString().toString());
+            quotationCoinOut = this.coinApi.getById(requestDTO.coinOutString().toString());
+            investimentType= this.investimentApi.getInvestimentById(requestDTO.investimentType().toString());
 
         }catch (IOException | InterruptedException e){
-            ResponseDTO responseDTO = new ResponseDTO("false", null, 0, 0, null, 0, null, 0);
-            return responseDTO;
+            throw new FailedAcessAPIException(e.getMessage());
         }
+
+
         double amountInBRL = coinInputToBRL(quotationCoinInput, requestDTO.amountInput());
 
         double rendimentAfterTime = rendimentInTime(investimentType, amountInBRL, requestDTO.amountDay());
@@ -45,34 +47,32 @@ public class CalculatorService {
         float amountProfit = (float)(amountFinalInCoinInput - amountFinalToCoinOut(quotationCoinInput, amountInBRL));
 
         ResponseDTO response = new ResponseDTO(
-                "true",
-                requestDTO.coinOutString(),
-        (float)amountFinalInCoinInput,
-        amountProfit,
-        requestDTO.coinInputString(),
-        requestDTO.amountInput(),
-        investimentType.getName(),
-
-        requestDTO.amountDay()
+            requestDTO.coinOutString().toString(),
+            (float)amountFinalInCoinInput,
+            amountProfit,
+            requestDTO.coinInputString().toString(),
+            requestDTO.amountInput(),
+            investimentType.getName(),
+            requestDTO.amountDay()
         );
 
         return  response;
     }
 
 
-    public double rendimentInTime(Investiment investiment, double amountInBRL, int amountDays){
+    private double rendimentInTime(Investiment investiment, double amountInBRL, int amountDays){
         double taxForDay = Math.pow( (1 + (double)investiment.getAmount()/100) , (double)1/252 ) -1;
         double amountFinal = amountInBRL * Math.pow( (1+taxForDay), amountDays );
         return amountFinal;
     }
 
 
-    public double coinInputToBRL(Quotation quotationCoinInput, double amountInput){
+    private double coinInputToBRL(Quotation quotationCoinInput, double amountInput){
         // 5 unidades de Dólar = 5*6 = 30 reais
         return  amountInput * quotationCoinInput.getQuotationBuy();
     }
 
-    public double amountFinalToCoinOut(Quotation quotationCoinOut, double amountFinal){
+    private double amountFinalToCoinOut(Quotation quotationCoinOut, double amountFinal){
         //30 reais para dolar = 30 /  5.6 = +-6
         return (double)amountFinal / quotationCoinOut.getQuotationBuy();
     }

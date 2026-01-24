@@ -4,6 +4,7 @@ import com.valorize.valorize.DTO.RequestDTO;
 import com.valorize.valorize.DTO.ResponseDTO;
 import com.valorize.valorize.model.Coin;
 import com.valorize.valorize.service.CalculatorService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -21,8 +22,9 @@ public class CalculatorController {
     }
 
     @PostMapping
-    public ResponseDTO postCalculator(@RequestBody RequestDTO requestDTO){
+    public ResponseDTO postCalculator(@RequestBody @Valid RequestDTO requestDTO){
         //Validar entradas
+
         return this.calculatorService.postCalculator(requestDTO);
     }
 
